@@ -1,6 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+interface ServiceCardProps {
+  num: string;
+  title: string;
+  tag: string;
+  imgSrc: string;
+  onDetail: () => void;
+}
 
 // --- 1. 상세 데이터 정의 ---
 const SERVICE_DETAILS = {
@@ -135,10 +142,10 @@ function BlogSection() {
 }
 
 // --- 3. 서비스 카드 컴포넌트 ---
-const ServiceCard = ({ num, title, tag, imgSrc, onDetail }) => (
+const ServiceCard = ({ num, title, tag, imgSrc, onDetail }: ServiceCardProps) => (
   <div 
     onClick={onDetail}
-    className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-[#22C55E]/50 transition-all duration-500 cursor-pointer"
+    className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all cursor-pointer"
   >
     <div className="h-32 md:h-52 overflow-hidden relative">
       <img 
