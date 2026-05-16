@@ -1,55 +1,55 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-interface ServiceCardProps {
-  num: string;
-  title: string;
-  tag: string;
-  imgSrc: string;
-  onDetail: () => void;
-}
+// 💡 분리해둔 스마트 셀프견적 컴포넌트를 상단에서 불러옵니다.
+import SmartEstimator from '@/components/SmartEstimator';
 
-// --- 1. 상세 데이터 정의 ---
+// --- [4대 핵심 분야] 데이터 정의 ---
 const SERVICE_DETAILS = {
   "01": {
     title: "융착식 도색",
-    description: "고온(약 180°C~220°C)으로 녹인 융착형 도료를 사용하여 노면에 강력하게 부착시키는 공법입니다. 건조 속도가 빠르고 내구성이 뛰어나 통행량이 많은 도로에 최적입니다.",
-    features: ["야간 시인성 극대화", "사계절 기온 변화에 강한 부착력", "KS 표준 규격 준수 시공"],
-    img: "/images/service01.jpg"
+    description: "약 180°C~220°C의 고온 용융 공법을 사용하여 노면과의 강력한 결합력을 확보합니다. 작업이 다소 지연되더라도 도로교통법 및 시방서 표준 규격에 맞춘 정확한 글라스비드 살포량을 철저히 준수하여, 야간과 우천 시에도 운전자의 시인성을 완벽하게 확보하고 추돌 사고를 방지합니다.",
+    features: ["시방서 기준 정량 시공 원칙", "야간·우천 시 운전자 시인성 확보", "도로교통법 표준 규격 100% 준수"],
+    subTypes: null,
+    img: "/images/service_fusion.jpg"
   },
   "02": {
-    title: "상온식 페인트 도색",
-    description: "상온에서 자연 건조되는 도료를 사용하는 경제적인 공법입니다. 시공이 간편하여 주차장, 단지 내 도로, 보수 도색 등에 널리 사용됩니다.",
-    features: ["경제적인 시공 비용", "다양한 색상 선택 가능", "신속한 당일 시공 및 개통"],
-    img: "/images/service02.jpg"
+    title: "페인트 도색",
+    description: "현장 상황과 목적에 맞는 최적의 도료를 선택하여 도로의 가이드라인을 선명하게 구축합니다. 공기를 맞추기 위해 공정을 건너뛰지 않으며, 규정된 두께와 선명도를 바르게 준수하여 도로 위 안전을 책임집니다.",
+    features: ["상황별 맞춤형 전문 도료 적용", "규정된 도료 두께 및 선명도 사수", "단지 내 주의 구간 표준 시공"],
+    subTypes: [
+      {
+        name: "상온식 페인트 도색",
+        desc: "상온 자연 건조 도료를 사용하여 주차장 및 단지 내 보행자 동선을 명확히 분리하고, 생활 속 안전 가이드라인을 바르게 도색합니다."
+      },
+      {
+        name: "수용성 페인트 도색",
+        desc: "유해 물질 배출이 없는 친환경 저독성 도료를 사용하여 어린이 보호구역(스쿨존) 및 교통약자 보호구역의 미끄럼 방지와 시인성을 준수합니다."
+      },
+      {
+        name: "이액형 페인트 도색",
+        desc: "화학적 결합을 통해 내마모성을 극대화하는 공법으로, 통행량이 많아 차선 마모와 교통 혼선 우려가 큰 구간에 엄격한 배합 비율로 시공합니다."
+      }
+    ],
+    img: "/images/service_paint.jpg"
   },
   "03": {
-    title: "수용성 페인트 도색",
-    description: "친환경 수성 도료를 사용하여 유해 물질 배출을 최소화한 공법입니다. 어린이 보호구역, 공원, 보행자 전용 도로 등에 가장 적합합니다.",
-    features: ["친환경 및 저독성 소재", "우수한 부착력과 색상 유지", "냄새 없는 쾌적한 시공 환경"],
-    img: "/images/service03.jpg"
+    title: "미끄럼방지 포장",
+    description: "제동 거리 확보가 필수적인 사고 위험 지역 및 급경사 구간에 특수 골재를 시공합니다. 1㎡당 규정된 골재 투입량과 결합재 규격을 정직하게 지켜 우천 및 동절기 노면 슬립 현상을 방지하고 차량과 보행자를 두터이 보호합니다.",
+    features: ["우천·동절기 제동 거리 확보", "규정된 골재 투입량 정직한 준수", "노면 밀착을 위한 표준 공정 사수"],
+    subTypes: null,
+    img: "/images/service_slip.jpg"
   },
   "04": {
-    title: "이액형 페인트 도색",
-    description: "주제와 경화제를 혼합 시공하여 화학적 결합을 유도하는 고성능 공법입니다. 일반 페인트보다 월등한 내마모성과 접착력을 제공합니다.",
-    features: ["반영구적인 내구성", "초강력 노면 밀착력", "고급스러운 외관 품질"],
-    img: "/images/service04.jpg"
-  },
-  "05": {
-    title: "미끄럼방지 포장",
-    description: "급경사, 교차로 등 사고 위험 지역에 특수 골재를 시공하여 마찰력을 높입니다. 우천 시에도 짧은 제동 거리를 확보하여 안전을 지킵니다.",
-    features: ["우수한 미끄럼 저항성", "시인성 높은 컬러 포장", "강력한 사고 예방 효과"],
-    img: "/images/service05.jpg"
-  },
-  "06": {
-    title: "도로 시설물",
-    description: "규제봉, 방지턱, 카스토퍼, 도로 표지판 등 안전을 위한 시설물을 정밀 설치합니다. 현장 조건에 맞춰 가장 견고한 방식으로 시공합니다.",
-    features: ["표준 규격 제품 사용", "정밀한 위치 선정 및 설치", "노후 시설 보수 및 유지관리"],
-    img: "/images/service06.jpg"
+    title: "도로 시설물 설치",
+    description: "규제봉, 과속방지턱, 카스토퍼 등 도로 위 필수 안전 인프라를 설치합니다. 속도전 위주로 대충 고정하는 시공이 아니라, 차량 충격에도 쉽게 이탈되어 2차 사고를 유발하지 않도록 시방서 지침 규격에 맞춘 견고한 고정 공법만을 고집합니다.",
+    features: ["국토교통부 지침 표준 규격 제품", "2차 사고를 방지하는 견고한 고정", "보행자 및 차량 동선 고려 표준 배치"],
+    subTypes: null,
+    img: "/images/service_facility.jpg"
   }
 };
 
-// --- 2. 블로그 섹션 컴포넌트 (모바일 가독성 강화 버전) ---
+// --- 블로그 섹션 컴포넌트 ---
 function BlogSection() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,11 +68,11 @@ function BlogSection() {
   }, []);
 
   return (
-    <section className="py-24 md:py-52 bg-[#0F172A] border-t border-white/5">
+    <section className="pt-14 pb-20 md:pt-20 md:pb-28 bg-[#0F172A] border-t border-white/5">
       <div className="px-4 md:px-32 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-12 md:mb-24">
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-10 md:mb-14">
           <div>
-            <h3 className="text-4xl md:text-6xl font-[1000] tracking-tighter uppercase italic opacity-10 mb-6 text-white">Field Journal.</h3>
+            <h3 className="text-4xl md:text-5xl font-[1000] tracking-tighter uppercase italic opacity-10 mb-3 text-white">Field Journal.</h3>
             <div className="flex items-center gap-3">
               <span className="w-8 h-[1px] bg-[#22C55E]"></span>
               <p className="text-[#22C55E] text-[10px] font-black tracking-[0.4em] uppercase">최신 시공 사례</p>
@@ -82,16 +82,15 @@ function BlogSection() {
             href="https://blog.naver.com/lee_eung1446" 
             target="_blank"
             rel="noopener noreferrer"
-            className="group px-6 py-3 md:px-8 md:py-4 border border-white/10 hover:border-[#22C55E] transition-all text-[9px] md:text-[10px] font-bold tracking-widest uppercase text-white rounded-full"
+            className="group px-6 py-2.5 md:px-8 md:py-3.5 border border-white/10 hover:border-[#22C55E] transition-all text-[9px] md:text-[10px] font-bold tracking-widest uppercase text-white rounded-full"
           >
             Visit Official Blog
           </a>
         </div>
 
-        {/* 모바일 2열 그리드 유지 & 간격 최적화 */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
           {loading ? (
-            <div className="col-span-full py-20 text-center text-white/20 text-xs tracking-widest uppercase animate-pulse">Loading Journals...</div>
+            <div className="col-span-full py-12 text-center text-white/20 text-xs tracking-widest uppercase animate-pulse">Loading Journals...</div>
           ) : (
             posts.map((post) => (
               <a 
@@ -101,7 +100,6 @@ function BlogSection() {
                 rel="noopener noreferrer"
                 className="group relative flex flex-col bg-[#020617]/50 border border-white/5 hover:border-[#22C55E]/50 transition-all duration-500 rounded-2xl overflow-hidden shadow-xl"
               >
-                {/* 이미지 높이 확보 */}
                 <div className="relative h-36 md:h-56 overflow-hidden">
                   <div className="absolute inset-0 bg-[#22C55E]/5 group-hover:bg-transparent transition-colors z-10"></div>
                   <img 
@@ -112,17 +110,14 @@ function BlogSection() {
                   />
                 </div>
                 
-                {/* 텍스트 영역 가독성 강화 */}
                 <div className="p-4 md:p-6 flex flex-col flex-grow">
                   <span className="text-[10px] md:text-[11px] font-bold text-[#22C55E] mb-2 tracking-tight">
                     {post.date}
                   </span>
-                  {/* 제목 크기를 14px로 키우고 줄간격을 확보함 */}
                   <h4 className="text-[14px] md:text-lg font-bold text-white leading-[1.5] group-hover:text-white transition-colors line-clamp-2 break-keep">
                     {post.title}
                   </h4>
-                  
-                  <div className="mt-auto pt-6 flex items-center justify-between">
+                  <div className="mt-auto pt-4 flex items-center justify-between">
                     <span className="hidden md:inline text-[11px] font-bold text-white/20 group-hover:text-white/50 transition-colors uppercase tracking-widest">Read More</span>
                     <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-[#22C55E] group-hover:border-[#22C55E] transition-all ml-auto">
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="md:w-[12px] md:h-[12px]">
@@ -141,35 +136,31 @@ function BlogSection() {
   );
 }
 
-// --- 3. 서비스 카드 컴포넌트 ---
-const ServiceCard = ({ num, title, tag, imgSrc, onDetail }: ServiceCardProps) => (
-  <div 
-    onClick={onDetail}
-    className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all cursor-pointer"
-  >
-    <div className="h-32 md:h-52 overflow-hidden relative">
-      <img 
-        src={imgSrc || "https://images.unsplash.com/photo-1545143333-6382f1d5b893?q=80&w=800"} 
-        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-100"
-        alt={title}
-      />
+// --- 서비스 카드 컴포넌트 ---
+const ServiceCard = ({ num, title, tag, imgSrc, onDetail }: { num: string; title: string; tag: string; imgSrc: string; onDetail: () => void }) => (
+  <div onClick={onDetail} className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-[#22C55E]/50 transition-all cursor-pointer">
+    <div className="h-32 md:h-48 overflow-hidden relative bg-slate-900">
+      <img src={imgSrc} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-100 min-h-full" alt={title} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
       <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent"></div>
     </div>
-    <div className="p-4 md:p-8">
-      <div className="flex items-center gap-1.5 mb-2 md:mb-4">
+    <div className="p-4 md:p-6">
+      <div className="flex items-center gap-1.5 mb-1.5 md:mb-3">
         <span className="text-[#22C55E] text-[8px] md:text-[10px] font-bold uppercase tracking-widest">{num}</span>
         <span className="text-white/30 text-[8px] md:text-[10px] font-bold uppercase tracking-widest">{tag}</span>
       </div>
-      <h3 className="text-sm md:text-xl font-bold text-white group-hover:text-[#22C55E] transition-colors leading-tight">{title}</h3>
+      <h3 className="text-sm md:text-lg font-bold text-white group-hover:text-[#22C55E] transition-colors leading-tight">{title}</h3>
     </div>
   </div>
 );
 
-// --- 4. 메인 홈 컴포넌트 ---
+// --- 메인 홈 컴포넌트 ---
 export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  
+  // 💡 새롭게 만든 정밀 SmartEstimator 모달 창을 띄우는 상태 제어 변수
+  const [isEstimatorOpen, setIsEstimatorOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -182,162 +173,224 @@ export default function Home() {
       
       {/* NAV */}
       <nav className={`fixed top-0 w-full z-[100] transition-all duration-500 px-6 md:px-16 flex justify-between items-center ${
-        isScrolled || isMobileMenuOpen ? 'bg-[#0F172A]/95 backdrop-blur-md py-5 border-b border-white/5 shadow-2xl' : 'bg-transparent py-10'
+        isScrolled || isMobileMenuOpen ? 'bg-[#0F172A]/95 backdrop-blur-md py-4 border-b border-white/5 shadow-2xl' : 'bg-transparent py-6 md:py-8'
       }`}>
-        <a href="#home" className="flex items-center gap-5 z-[110] cursor-pointer group">
-          <div className="flex gap-2 items-center">
-            <div className="w-1.5 h-7 bg-[#EF4444] rounded-full shadow-[0_0_12px_rgba(239,68,68,0.8)]"></div>
-            <div className="w-1.5 h-7 bg-[#FACC15] rounded-full shadow-[0_0_12px_rgba(250,204,21,0.8)]"></div>
-            <div className="w-1.5 h-7 bg-[#22C55E] rounded-full shadow-[0_0_12px_rgba(34,197,94,0.8)]"></div>
+        <a href="#home" className="flex items-center gap-4 z-[110] cursor-pointer group">
+          <div className="flex gap-1.5 items-center">
+            <div className="w-1 h-6 bg-[#EF4444] rounded-full shadow-[0_0_10px_rgba(239,68,68,0.8)]"></div>
+            <div className="w-1 h-6 bg-[#FACC15] rounded-full shadow-[0_0_10px_rgba(250,204,21,0.8)]"></div>
+            <div className="w-1 h-6 bg-[#22C55E] rounded-full shadow-[0_0_10px_rgba(34,197,94,0.8)]"></div>
           </div>
           <div className="flex flex-col">
-            <span className="text-2xl md:text-3xl font-[1000] tracking-tighter uppercase italic leading-none text-white group-hover:text-[#22C55E] transition-colors">이응도로안전</span>
-            <span className="text-[10px] font-black tracking-[0.45em] text-white/40 uppercase mt-1.5 leading-none">Safety First Engineering</span>
+            <span className="text-xl md:text-2xl font-[1000] tracking-tighter uppercase italic leading-none text-white group-hover:text-[#22C55E] transition-colors">이응도로안전</span>
+            <span className="text-[9px] font-black tracking-[0.45em] text-white/40 uppercase mt-1 leading-none">Safety First Engineering</span>
           </div>
         </a>
         
-        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden fixed top-10 right-8 flex flex-col gap-1.5 z-[160] p-2 bg-black/20 rounded-lg backdrop-blur-sm">
+        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden fixed top-6 right-6 flex flex-col gap-1.5 z-[160] p-2 bg-black/20 rounded-lg backdrop-blur-sm">
           <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
           <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`}></span>
           <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
         </button>
 
-        <div className={`fixed inset-0 w-full h-screen bg-[#0F172A] z-[150] flex flex-col items-center justify-start pt-48 gap-10 transition-all duration-500 lg:hidden ${isMobileMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}>
-          {['About', 'Services', 'Portfolio', 'Contact'].map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setIsMobileMenuOpen(false)} className="text-[28px] font-black tracking-[0.25em] text-white hover:text-[#22C55E]">
-              {item === 'About' ? '회사소개' : item === 'Services' ? '사업분야' : item === 'Portfolio' ? '시공사례' : '견적문의'}
+        <div className={`fixed inset-0 w-full h-screen bg-[#0F172A] z-[150] flex flex-col items-center justify-start pt-36 gap-8 transition-all duration-500 lg:hidden ${isMobileMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}>
+          {['About', 'Services', 'Estimator', 'Portfolio', 'Contact'].map((item) => (
+            <a 
+              key={item} 
+              href={item === 'Estimator' ? undefined : `#${item.toLowerCase()}`}
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                if (item === 'Estimator') setIsEstimatorOpen(true);
+              }} 
+              className="text-[24px] font-black tracking-[0.25em] text-white hover:text-[#22C55E] cursor-pointer"
+            >
+              {item === 'About' ? '회사소개' : item === 'Services' ? '사업분야' : item === 'Estimator' ? '스마트셀프견적' : item === 'Portfolio' ? '시공사례' : '견적문의'}
             </a>
           ))}
         </div>
 
-        <div className="hidden lg:flex gap-14 text-[15px] font-bold tracking-wider text-white/70">
-          {['About', 'Services', 'Portfolio', 'Contact'].map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} className="hover:text-[#22C55E] transition-colors">
-              {item === 'About' ? '회사소개' : item === 'Services' ? '사업분야' : item === 'Portfolio' ? '시공사례' : '견적문의'}
-            </a>
-          ))}
+        <div className="hidden lg:flex gap-10 text-[14px] font-bold tracking-wider text-white/70">
+          <a href="#about" className="hover:text-[#22C55E] transition-colors">회사소개</a>
+          <a href="#services" className="hover:text-[#22C55E] transition-colors">사업분야</a>
+          {/* 상단 탭 메뉴에도 스마트셀프견적 즉시 실행 연동 */}
+          <button onClick={() => setIsEstimatorOpen(true)} className="hover:text-[#22C55E] transition-colors font-bold">스마트셀프견적</button>
+          <a href="#portfolio" className="hover:text-[#22C55E] transition-colors">시공사례</a>
+          <a href="#contact" className="hover:text-[#22C55E] transition-colors">견적문의</a>
         </div>
       </nav>
 
       {/* HERO */}
-      <section id="home" className="relative h-screen flex items-center px-6 md:px-32 bg-[#0F172A]">
+      <section id="home" className="relative min-h-[55vh] md:h-[70vh] flex items-center px-6 md:px-32 bg-[#0F172A] pt-16">
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1545143333-6382f1d5b893?q=80&w=2000" className="w-full h-full object-cover opacity-10 grayscale" alt="Hero" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#0F172A] via-transparent to-[#0F172A]"></div>
         </div>
         <div className="relative z-10 w-full max-w-5xl">
-          <div className="inline-flex items-center gap-3 mb-12">
+          <div className="inline-flex items-center gap-3 mb-6 md:mb-8">
             <span className="h-[1px] w-12 bg-[#22C55E]"></span>
-            <span className="text-[#22C55E] text-[10px] font-black tracking-[0.5em] uppercase">The Art of Road Marking</span>
+            <span className="text-[#22C55E] text-[10px] font-black tracking-[0.5em] uppercase">Road Safety & Principle</span>
           </div>
-          <h1 className="text-[10vw] md:text-[6.2vw] font-black leading-[1.05] tracking-[-0.05em] mb-12 text-white">
-            The Precision <br /><span className="text-white/20 italic">Marking Solution.</span>
+          <h1 className="text-[9vw] md:text-[5.5vw] font-black leading-[1.1] tracking-[-0.04em] mb-6 text-white break-keep">
+            안전을 긋다, <br /><span className="text-[#22C55E] italic">원칙을 세우다.</span>
           </h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-end">
-            <p className="text-white/40 text-base md:text-lg font-medium leading-relaxed break-keep max-w-sm">
-              가장 선명한 가이드라인으로 도로의 질서를 만듭니다. <br /> 대구·경북·경남 지역 도로안전의 새로운 기준입니다.
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+            <p className="text-white/50 text-sm md:text-base font-medium leading-relaxed break-keep max-w-sm">
+              속도보다 안전을, 마감보다 원칙을 우선합니다. <br /> 
+              타협하지 않는 <span className="text-white">규격 시공</span>으로 <br />
+              도로 위 소중한 생명을 지킵니다.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 w-full mt-8">
-              <a href="https://open.kakao.com/o/sv4661ui" target="_blank" rel="noopener noreferrer" className="flex-[1.2] px-6 py-5 bg-[#FAE100] text-[#3C1E1E] font-extrabold text-[15px] hover:bg-white transition-all rounded-sm text-center">카톡 견적 상담</a>
-              <a href="tel:010-8339-6557" className="flex-1 px-6 py-5 border border-white/20 text-white font-extrabold text-[15px] hover:bg-[#22C55E] transition-all rounded-sm text-center">전화 상담 바로가기</a>
+            
+            {/* 영업 버튼 그룹 - 세 번째 버튼 클릭 시 새로 분리한 전문 견적기 오픈 */}
+            <div className="flex flex-col sm:flex-row gap-2.5 w-full mt-4 md:mt-0">
+              <a href="https://open.kakao.com/o/sv4661ui" target="_blank" rel="noopener noreferrer" className="flex-1 px-2 py-3.5 bg-[#FAE100] text-[#3C1E1E] font-[900] text-[12px] sm:text-[13px] hover:bg-white transition-all rounded-xl text-center shadow-md tracking-tight block">
+                카톡 견적 상담
+              </a>
+              <a href="tel:010-8339-6557" className="flex-1 px-2 py-3.5 border border-white/10 bg-white/5 text-white font-[900] text-[12px] sm:text-[13px] hover:bg-white hover:text-black transition-all rounded-xl text-center tracking-tight block">
+                전화 상담하기
+              </a>
+              <button onClick={() => setIsEstimatorOpen(true)} className="flex-1 px-2 py-3.5 bg-[#22C55E] text-white font-[900] text-[12px] sm:text-[13px] hover:bg-[#16a34a] transition-all rounded-xl text-center shadow-[0_0_15px_rgba(34,197,94,0.4)] tracking-tight block animate-pulse hover:animate-none">
+                ⚡ 스마트 셀프견적
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* IDENTITY */}
-      <section id="about" className="py-32 md:py-52 px-6 md:px-32 max-w-7xl mx-auto border-t border-white/5">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-24 items-start">
+      {/* IDENTITY (사업소개) */}
+      <section id="about" className="pt-14 pb-16 md:pt-20 md:pb-24 px-6 md:px-32 max-w-7xl mx-auto border-t border-white/5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start mb-12">
           <div className="lg:col-span-6">
-            <h2 className="text-[#22C55E] text-[9px] font-black tracking-[0.8em] uppercase mb-8 italic opacity-60">Company Identity</h2>
-            <h3 className="text-4xl md:text-5xl font-black tracking-tighter text-white">단순한 도색이 아닌 <br /><span className="text-white/30 italic">생명선을 긋습니다.</span></h3>
+            <h2 className="text-[#22C55E] text-[9px] font-black tracking-[0.8em] uppercase mb-4 italic opacity-60">Company Identity</h2>
+            <h3 className="text-3xl md:text-4xl font-black tracking-tighter text-white leading-[1.2]">
+              작업이 늦어지더라도, <br />
+              <span className="text-[#22C55E]">안전 수칙</span>과 <span className="text-white/30 italic">규격 시공은 타협하지 않습니다.</span>
+            </h3>
           </div>
-          <div className="lg:col-span-6 text-white/40 text-lg leading-relaxed">
-            이응도로안전은 젊은 감각과 숙련된 노하우를 결합했습니다. 대구·경북·경남 지역을 거점으로 완벽한 시공을 보장합니다.
-            <div className="grid grid-cols-3 gap-8 border-t border-white/5 pt-12 mt-12">
-              <StatItem title="Precision" value="0.1mm" />
-              <StatItem title="Region" value="Dae-Gyeong" />
-              <StatItem title="Standard" value="KS-Mark" />
+          <div className="lg:col-span-6 text-white/50 text-sm md:text-base font-medium leading-relaxed break-keep pt-1">
+            이응도로안전의 최우선 가치는 속도가 아닌 '원칙'입니다. 현장 마감 독촉에 쫓겨 공정을 생략하거나 하자와 타협하지 않습니다. 정해진 안전 수칙을 완벽히 지키고, 표준 시방서 규격을 미련할 만큼 바르게 준수하는 것만이 장기적으로 신뢰받는 기업을 만드는 유일한 길임을 약속드립니다.
+          </div>
+        </div>
+
+        <div className="bg-[#020617]/60 border border-white/5 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#22C55E]/5 rounded-full blur-3xl"></div>
+          <div className="max-w-4xl mx-auto relative z-10">
+            <p className="text-[#22C55E] text-center text-[10px] font-black tracking-[0.4em] uppercase mb-6 md:mb-8">이응도로안전의 변치 않는 원칙 지표</p>
+            <div className="grid grid-cols-2 gap-4 md:gap-8 divide-x divide-white/5">
+              <div className="flex flex-col items-center text-center px-2 sm:px-6">
+                <span className="text-2xl sm:text-4xl md:text-5xl font-[1000] text-white mb-1 md:mb-3 tracking-tight italic">0건</span>
+                <span className="text-[9px] sm:text-xs font-bold text-slate-200 mb-2 md:mb-3 bg-white/5 px-2 sm:px-4 py-1 rounded-full border border-white/10 tracking-tighter sm:tracking-wider">현장 안전수칙 위반</span>
+                <p className="text-[9px] sm:text-xs text-white/40 max-w-sm leading-relaxed break-keep">철저한 신호수 배치 and 안전 장비 착용 등 기본 수칙을 절대 생략하지 않겠습니다.</p>
+              </div>
+              <div className="flex flex-col items-center text-center px-2 sm:px-6">
+                <span className="text-2xl sm:text-4xl md:text-5xl font-[1000] text-white mb-1 md:mb-3 tracking-tight italic">0%</span>
+                <span className="text-[9px] sm:text-xs font-bold text-slate-200 mb-2 md:mb-3 bg-white/5 px-2 sm:px-4 py-1 rounded-full border border-white/10 tracking-tighter sm:tracking-wider">표준 규격 오차율</span>
+                <p className="text-[9px] sm:text-xs text-white/40 max-w-sm leading-relaxed break-keep">적정 도포 온도 및 정량 원료 사용 등 시방서 기준을 있는 그대로 수호하겠습니다.</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* SERVICES */}
-      <section id="services" className="py-24 px-4 md:px-12 bg-[#020617]">
+      <section id="services" className="py-14 md:py-20 px-4 md:px-12 bg-[#020617] border-t border-white/5">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-12">
-            <span className="text-[#22C55E] text-[10px] font-black tracking-[0.5em] uppercase">What we do</span>
-            <h2 className="text-3xl md:text-5xl font-black mt-4 text-white">사업분야</h2>
+          <div className="mb-8">
+            <span className="text-[#22C55E] text-[10px] font-black tracking-[0.5em] uppercase">Expertise</span>
+            <h2 className="text-2xl md:text-4xl font-black mt-2 text-white">사업분야</h2>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {Object.entries(SERVICE_DETAILS).map(([id, service]) => (
-              <ServiceCard 
-                key={id}
-                num={id} 
-                title={service.title} 
-                tag={id === "01" ? "Durability" : id === "03" ? "Eco" : "Safety"} 
-                imgSrc={service.img} 
-                onDetail={() => setSelectedId(id)} 
-              />
+              <ServiceCard key={id} num={id} title={service.title} tag="Professional" imgSrc={service.img} onDetail={() => setSelectedId(id)} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* 모달 팝업 */}
+      {/* 사업분야 상세 모달 */}
       {selectedId && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-md" onClick={() => setSelectedId(null)}></div>
-          <div className="relative bg-[#0F172A] border border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+          <div className="relative bg-[#0F172A] border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 max-h-[90vh] flex flex-col">
             <button onClick={() => setSelectedId(null)} className="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center bg-black/50 hover:bg-[#22C55E] backdrop-blur-md rounded-full border border-white/20 text-white transition-all duration-300">✕</button>
-            <div className="h-56 md:h-72 overflow-hidden">
-              <img src={SERVICE_DETAILS[selectedId].img} className="w-full h-full object-cover" alt="detail" />
+            <div className="h-44 md:h-60 flex-shrink-0 overflow-hidden bg-slate-900">
+              <img src={SERVICE_DETAILS[selectedId].img} className="w-full h-full object-cover min-h-full" alt="detail" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
             </div>
-            <div className="p-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">{SERVICE_DETAILS[selectedId].title}</h2>
-              <p className="text-white/60 mb-8 leading-relaxed break-keep text-sm md:text-base">{SERVICE_DETAILS[selectedId].description}</p>
-              <div className="space-y-4">
-                <h4 className="text-[#22C55E] font-bold text-xs uppercase tracking-widest">핵심 특징</h4>
-                <ul className="grid grid-cols-1 gap-3">
-                  {SERVICE_DETAILS[selectedId].features.map((f, i) => (
-                    <li key={i} className="text-white/80 text-sm flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-[#22C55E] rounded-full"></span> {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">{SERVICE_DETAILS[selectedId].title}</h2>
+              <p className="text-white/60 mb-5 leading-relaxed break-keep text-sm">{SERVICE_DETAILS[selectedId].description}</p>
+              {SERVICE_DETAILS[selectedId].subTypes ? (
+                <div className="space-y-4 pt-1">
+                  <h4 className="text-[#22C55E] font-black text-xs uppercase tracking-widest flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#22C55E] rounded-full animate-pulse"></span> 페인트 도색 분류 및 특징
+                  </h4>
+                  <div className="grid grid-cols-1 gap-3">
+                    {SERVICE_DETAILS[selectedId].subTypes.map((sub, i) => (
+                      <div key={i} className="bg-white/5 border border-white/5 rounded-xl p-3.5 hover:border-[#22C55E]/30 transition-all">
+                        <h5 className="text-white font-bold text-sm mb-1 flex items-center gap-2"><span className="text-[#22C55E] text-xs">◆</span> {sub.name}</h5>
+                        <p className="text-white/50 text-xs leading-relaxed break-keep">{sub.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <h4 className="text-[#22C55E] font-bold text-xs uppercase tracking-widest">핵심 준수 원칙</h4>
+                  <ul className="grid grid-cols-1 gap-2">
+                    {SERVICE_DETAILS[selectedId].features.map((f, i) => (
+                      <li key={i} className="text-white/80 text-sm flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#22C55E] rounded-full"></span> {f}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* PORTFOLIO (강화된 가독성 적용) */}
+      {/* ⚡ 분리해둔 다기능 스마트 셀프견적 모달 창 구역 */}
+      {isEstimatorOpen && (
+        <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
+          {/* 뒷배경 누르면 모달 닫힘 */}
+          <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-md" onClick={() => setIsEstimatorOpen(false)}></div>
+          
+          <div className="relative bg-[#0F172A] border border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 max-h-[92vh] flex flex-col text-white">
+            {/* 모달 상단 우측 X 닫기 버튼 */}
+            <button onClick={() => setIsEstimatorOpen(false)} className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-red-500 backdrop-blur-md rounded-full border border-white/10 text-white transition-all text-xs">✕</button>
+            
+            {/* 💡 components/SmartEstimator.tsx 내용이 이 스크롤 영역에 매끄럽게 마운트됩니다. */}
+            <div className="p-2 md:p-4 overflow-y-auto custom-scrollbar">
+              <SmartEstimator />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PORTFOLIO */}
       <section id="portfolio">
         <BlogSection />
       </section>
 
       {/* CONTACT */}
-      <section id="contact" className="py-60 px-6 text-center bg-[#020617] relative overflow-hidden border-t border-white/5">
-        <div className="max-w-4xl mx-auto space-y-16 relative z-10">
+      <section id="contact" className="py-28 md:py-36 px-6 text-center bg-[#020617] relative overflow-hidden border-t border-white/5">
+        <div className="max-w-4xl mx-auto space-y-10 relative z-10">
           <h2 className="text-[#22C55E] text-[10px] font-black tracking-[1.2em] uppercase opacity-60">Get in touch</h2>
-          <p className="text-5xl md:text-7xl font-black tracking-tight text-white">가장 선명하고 안전한 <br />길의 시작.</p>
-          <a href="tel:010-8339-6557" className="text-4xl md:text-6xl font-black border-b border-[#22C55E] hover:text-[#22C55E] transition-all pb-2 text-white inline-block">010.8339.6557</a>
+          <p className="text-4xl md:text-6xl font-black tracking-tight text-white">가장 선명하고 안전한 <br />길의 시작.</p>
+          <a href="tel:010-8339-6557" className="text-3xl md:text-5xl font-black border-b border-[#22C55E] hover:text-[#22C55E] transition-all pb-1 text-white inline-block">010.8339.6557</a>
         </div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[45vw] font-black text-white/[0.015] select-none pointer-events-none uppercase italic">EUNG</div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[45vw] font-black text-white/[0.012] select-none pointer-events-none uppercase italic">EUNG</div>
       </section>
 
       {/* FOOTER */}
-      <footer className="py-20 px-6 md:px-32 bg-[#0F172A] border-t border-white/5">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
-           <div className="flex items-center gap-8">
-             <div className="flex gap-2 items-center">
-               <div className="w-1.5 h-7 bg-[#EF4444] rounded-full"></div>
-               <div className="w-1.5 h-7 bg-[#FACC15] rounded-full"></div>
-               <div className="w-1.5 h-7 bg-[#22C55E] rounded-full"></div>
+      <footer className="py-12 px-6 md:px-32 bg-[#0F172A] border-t border-white/5">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+           <div className="flex items-center gap-6">
+             <div className="flex gap-1.5 items-center">
+               <div className="w-1 h-6 bg-[#EF4444] rounded-full shadow-[0_0_10px_rgba(239,68,68,0.8)]"></div>
+               <div className="w-1 h-6 bg-[#FACC15] rounded-full shadow-[0_0_10px_rgba(250,204,21,0.8)]"></div>
+               <div className="w-1 h-6 bg-[#22C55E] rounded-full shadow-[0_0_10px_rgba(34,197,94,0.8)]"></div>
              </div>
              <div className="flex flex-col text-white">
-               <span className="text-xl font-black uppercase italic">이응도로안전</span>
+               <span className="text-lg font-black uppercase italic">이응도로안전</span>
                <span className="text-[8px] font-bold text-white/20 tracking-[0.2em]">Precision Engineering Group</span>
              </div>
            </div>
@@ -345,14 +398,5 @@ export default function Home() {
         </div>
       </footer>
     </main>
-  );
-}
-
-function StatItem({ title, value }: { title: string, value: string }) {
-  return (
-    <div>
-      <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] mb-2">{title}</p>
-      <p className="text-2xl font-black tracking-tighter text-white/90">{value}</p>
-    </div>
   );
 }
