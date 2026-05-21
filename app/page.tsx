@@ -1,50 +1,40 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-// 스마트 셀프견적 컴포넌트를 불러옵니다.
 import SmartEstimator from '@/components/SmartEstimator';
 
-// --- [4대 핵심 분야] 데이터 정의 ---
+// --- [4대 핵심 분야] 데이터 정의 (AI 개요 기반 업데이트) ---
 const SERVICE_DETAILS = {
   "01": {
     title: "융착식 도색",
-    description: "약 180°C~220°C의 고온 용융 공법을 사용하여 노면과의 강력한 결합력을 확보합니다. 작업이 다소 지연되더라도 도로교통법 및 시방서 표준 규격에 맞춘 정확한 글라스비드 살포량을 철저히 준수하여, 야간과 우천 시에도 운전자의 시인성을 완벽하게 확보하고 추돌 사고를 방지합니다.",
-    features: ["시방서 기준 정량 시공 원칙", "야간·우천 시 운전자 시인성 확보", "도로교통법 표준 규격 100% 준수"],
-    subTypes: null,
+    description: "분말 형태의 열가소성 플라스틱 도료를 약 180℃ ~ 220℃ 이상의 고온으로 가열하여 녹인 뒤, 노면에 두껍게 펴 바르는 차선 도색 방식입니다. 도료가 식으면서 단단하게 굳어 접착되는 원리를 이용합니다",
+    pros: ["압도적인 수명과 강력한 내마모성", "글라스비드 고정력 우수로 야간 시인성 탁월", "시공 후 건조조 즉시 차량 통행 가능"],
+    cons: ["초기 시공 비용이 페인트식 대비 높은 편", "재도색 및 차선 제거 시 작업 난이도 높음"],
+    cautions: ["노면 습기 및 먼지 제거 등 사전 청소 필수", "동절기 부착력 확보를 위한 엄격한 온도 준수"],
     img: "/images/service_fusion.jpg"
   },
   "02": {
     title: "페인트 도색",
-    description: "현장 상황 및 목적에 맞는 최적의 도료를 선택하여 도로의 가이드라인을 선명하게 구축합니다. 공기를 맞추기 위해 공정을 건너뛰지 않으며, 규정된 두께와 선명도를 바르게 준수하여 도로 위 안전을 책임집니다.",
-    features: ["상황별 맞춤형 전문 도료 적용", "규정된 도료 두께 및 선명도 사수", "단지 내 주의 구간 표준 시공"],
-    subTypes: [
-      {
-        name: "상온식 페인트 도색",
-        desc: "상온 자연 건조 도료를 사용하여 주차장 및 단지 내 보행자 동선을 명확히 분리하고, 생활 속 안전 가이드라인을 바르게 도색합니다."
-      },
-      {
-        name: "수용성 페인트 도색",
-        desc: "유해 물질 배출이 없는 친환경 저독성 도료를 사용하여 어린이 보호구역(스쿨존) 및 교통약자 보호구역의 미끄럼 방지와 시인성을 준수합니다."
-      },
-      {
-        name: "이액형 페인트 도색",
-        desc: "화학적 결합을 통해 내마모성을 극대화하는 공법으로, 통행량이 많아 차선 마모와 교통 혼선 우려가 큰 구간에 엄격한 배합 비율로 시공합니다."
-      }
-    ],
+    description: "상온 건조 방식을 사용하여 비용이 경제적이며, 주차장 및 단지 내 보행자 동선 등 복잡하고 정교한 마킹이 필요한 구간에 유리합니다.",
+    pros: ["초기 재료비와 시공 단가가 매우 경제적", "문자, 기호 등 복잡한 문양 마킹에 최적화", "유지보수 및 재도색 작업이 매우 간편함"],
+    cons: ["융착식 대비 마찰에 약해 수명이 짧음", "도료가 완전히 마르는 건조 시간이 필요"],
+    cautions: ["완전 건조 전 차량 통제 및 보행 차단 필수", "기온 5°C 이하 또는 다습한 환경 시 시공 주의"],
     img: "/images/service_paint.jpg"
   },
   "03": {
     title: "미끄럼방지 포장",
-    description: "제동 거리 확보가 필수적인 사고 위험 지역 및 급경사 구간에 특수 골재를 시공합니다. 1㎡당 규정된 골재 투입량과 결합재 규격을 정직하게 지켜 우천 및 동절기 노면 슬립 현상을 방지하고 차량과 보행자를 두터이 보호합니다.",
-    features: ["우천·동절기 제동 거리 확보", "규정된 골재 투입량 정직한 준수", "노면 밀착을 위한 표준 공정 사수"],
-    subTypes: null,
+    description: "특수 골재와 결합재를 사용하여 노면의 마찰력을 극대화합니다. 어린이 보호구역, 급경사, 사고 위험 지역의 필수 시공 공법입니다.",
+    pros: ["차량 제동 거리의 획기적인 단축", "선명한 색상 포장으로 운전자 주의 환기", "우천 및 동절기 노면 슬립 현상 방지"],
+    cons: ["타 공종 대비 시공 단가가 가장 높은 편", "장기간 노후 시 골재 탈락 가능성 존재"],
+    cautions: ["결합재(MMA)의 배합 비율 엄격 준수", "들뜸 방지를 위한 기초 노면 정리리 및 전처리 중요"],
     img: "/images/service_slip.jpg"
   },
   "04": {
     title: "도로 시설물 설치",
-    description: "규제봉, 과속방지턱, 카스토퍼 등 도로 위 필수 안전 인프라를 설치합니다. 속도전 위주로 대충 고정하는 시공이 아니라, 차량 충격에도 쉽게 이탈되어 2차 사고를 유발하지 않도록 시방서 지침 규격에 맞춘 견고한 고정 공법만을 고집합니다.",
-    features: ["국토교통부 지침 표준 규격 제품", "2차 사고를 방지하는 견고한 고정", "보행자 및 차량 동선 고려 표준 배치"],
-    subTypes: null,
+    description: "국토교통부 표준 규격을 준수하는 안전 인프라를 구축합니다. 2차 사고 방지를 위한 견고한 고정 공법을 최우선으로 합니다.",
+    pros: ["검증된 KS 규격 제품 및 지침 준수", "충격에도 이탈되지 않는 견고한 고정력", "보행자 및 차량 동선을 고려한 배치"],
+    cons: ["저가형 비규격 제품 대비 가격대 형성", "시공 구간에 따른 장비 투입 필요"],
+    cautions: ["매립형 시공 시 지하 매설물 사전 확인", "카스토퍼 등 하부 충격 대응 견착 확인"],
     img: "/images/service_facility.jpg"
   }
 };
@@ -75,7 +65,7 @@ function BlogSection() {
             <h3 className="text-4xl md:text-5xl font-[1000] tracking-tighter uppercase italic opacity-10 mb-3 text-white">Field Journal.</h3>
             <div className="flex items-center gap-3">
               <span className="w-8 h-[1px] bg-[#22C55E]"></span>
-              <p className="text-[#22C55E] text-[10px] font-black tracking-[0.4em] uppercase">최신 시공 사례</p>
+              <p className="text-[#22C55E] text-[13px] font-black tracking-[0.4em] uppercase">최신 시공 사례</p>
             </div>
           </div>
           <a 
@@ -158,7 +148,6 @@ export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  // TypeScript 빌드 에러 방지를 위해 객체 Key 타입을 엄격하게 정의합니다.
   const [selectedId, setSelectedId] = useState<keyof typeof SERVICE_DETAILS | null>(null);
   const [isEstimatorOpen, setIsEstimatorOpen] = useState(false);
 
@@ -182,10 +171,9 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 팝업 닫기 기능 및 로컬 스토리지 기한 저장
   const closeNoticePopup = () => {
     if (dontShowToday) {
-      const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24시간 계산
+      const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000); 
       localStorage.setItem('hideNoticePopup', expiryTime.toString());
     }
     setIsNoticeOpen(false);
@@ -260,20 +248,21 @@ export default function Home() {
             안전을 긋다, <br /><span className="text-[#22C55E] italic">원칙을 세우다.</span>
           </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-            <p className="text-white/50 text-sm md:text-base font-medium leading-relaxed break-keep max-w-sm">
+            <p className="text-white/50 text-sm md:text-base font-medium leading-relaxed break-keep max-sm">
               속도보다 안전을, 마감보다 원칙을 우선합니다. <br /> 
               타협하지 않는 <span className="text-white">규격 시공</span>으로 <br />
               도로 위 소중한 생명을 지킵니다.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-2.5 w-full mt-4 md:mt-0">
-              <a href="https://open.kakao.com/o/sv4661ui" target="_blank" rel="noopener noreferrer" className="flex-1 px-2 py-3.5 bg-[#FAE100] text-[#3C1E1E] font-[900] text-[15px] sm:text-[15px] hover:bg-white transition-all rounded-xl text-center shadow-md tracking-tight block">
+              <a href="https://open.kakao.com/o/sv4661ui" target="_blank" rel="noopener noreferrer" className="flex-1 px-2 py-3.5 bg-[#FAE100] text-[#3C1E1E] font-[900] text-[15px] sm:text-[13px] hover:bg-white transition-all rounded-xl text-center shadow-md tracking-tight block">
                 카톡 견적 상담
               </a>
-              <a href="tel:010-8339-6557" className="flex-1 px-2 py-3.5 border border-white/10 bg-white/5 text-white font-[900] text-[15px] sm:text-[15px] hover:bg-white hover:text-black transition-all rounded-xl text-center tracking-tight block">
+              <a href="tel:010-8339-6557" className="flex-1 px-2 py-3.5 border border-white/10 bg-white/5 text-white font-[900] text-[15
+            px] sm:text-[13px] hover:bg-white hover:text-black transition-all rounded-xl text-center tracking-tight block">
                 전화 상담하기
               </a>
-              <button onClick={() => setIsEstimatorOpen(true)} className="flex-1 px-2 py-3.5 bg-[#22C55E] text-white font-[900] text-[15px] sm:text-[15px] hover:bg-[#16a34a] transition-all rounded-xl text-center shadow-[0_0_15px_rgba(34,197,94,0.4)] tracking-tight block animate-pulse hover:animate-none cursor-pointer border-none">
+              <button onClick={() => setIsEstimatorOpen(true)} className="flex-1 px-2 py-3.5 bg-[#22C55E] text-white font-[900] text-[15px] sm:text-[13px] hover:bg-[#16a34a] transition-all rounded-xl text-center shadow-[0_0_15px_rgba(34,197,94,0.4)] tracking-tight block animate-pulse hover:animate-none cursor-pointer border-none">
                 ⚡ 스마트 셀프견적 ⚡
               </button>
             </div>
@@ -287,7 +276,7 @@ export default function Home() {
           <div className="lg:col-span-6">
             <h2 className="text-[#22C55E] text-[9px] font-black tracking-[0.8em] uppercase mb-4 italic opacity-60">Company Identity</h2>
             <h3 className="text-3xl md:text-4xl font-black tracking-tighter text-white leading-[1.2]">
-             
+              작업이 늦어지더라도, <br />
               <span className="text-[#22C55E]">안전 수칙</span>과 <span className="text-white/30 italic">규격 시공은 타협하지 않습니다.</span>
             </h3>
           </div>
@@ -299,17 +288,17 @@ export default function Home() {
         <div className="bg-[#020617]/60 border border-white/5 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#22C55E]/5 rounded-full blur-3xl"></div>
           <div className="max-w-4xl mx-auto relative z-10">
-            <p className="text-[#22C55E] text-center text-[10px] font-black tracking-[0.4em] uppercase mb-6 md:mb-8">이응도로안전의 변치 않는 원칙 지표</p>
+            <p className="text-[#22C55E] text-center text-[12px] font-black tracking-[0.4em] uppercase mb-6 md:mb-8">이응도로안전의 변치 않는 원칙 지표</p>
             <div className="grid grid-cols-2 gap-4 md:gap-8 divide-x divide-white/5">
               <div className="flex flex-col items-center text-center px-2 sm:px-6">
-                <span className="text-2xl sm:text-4xl md:text-5xl font-[1000] text-white mb-1 md:mb-3 tracking-tight italic">0건</span>
-                <span className="text-[9px] sm:text-xs font-bold text-slate-200 mb-2 md:mb-3 bg-white/5 px-2 sm:px-4 py-1 rounded-full border border-white/10 tracking-tighter">현장 안전수칙 위반</span>
-                <p className="text-[9px] sm:text-xs text-white/40 max-w-sm leading-relaxed break-keep">철저한 신호수 배치와 안전 장비 착용 등 기본 수칙을 절대 생략하지 않겠습니다.</p>
+                <span className="text-3xl sm:text-4xl md:text-5xl font-[1000] text-white mb-1 md:mb-3 tracking-tight italic">0건</span>
+                <span className="text-[11px] sm:text-xs font-bold text-slate-200 mb-2 md:mb-3 bg-white/5 px-2 sm:px-4 py-1 rounded-full border border-white/10 tracking-tighter">현장 안전수칙 위반</span>
+                <p className="text-[11px] sm:text-xs text-white/40 max-w-sm leading-relaxed break-keep">철저한 신호수 배치와 안전 장비 착용 등 기본 수칙을 절대 생략하지 않겠습니다.</p>
               </div>
               <div className="flex flex-col items-center text-center px-2 sm:px-6">
-                <span className="text-2xl sm:text-4xl md:text-5xl font-[1000] text-white mb-1 md:mb-3 tracking-tight italic">0%</span>
-                <span className="text-[9px] sm:text-xs font-bold text-slate-200 mb-2 md:mb-3 bg-white/5 px-2 sm:px-4 py-1 rounded-full border border-white/10 tracking-tighter">표준 규격 오차율</span>
-                <p className="text-[9px] sm:text-xs text-white/40 max-w-sm leading-relaxed break-keep">적정 도포 온도 및 정량 원료 사용 등 시방서 기준을 있는 그대로 수호하겠습니다.</p>
+                <span className="text-3xl sm:text-4xl md:text-5xl font-[1000] text-white mb-1 md:mb-3 tracking-tight italic">0%</span>
+                <span className="text-[11px] sm:text-xs font-bold text-slate-200 mb-2 md:mb-3 bg-white/5 px-2 sm:px-4 py-1 rounded-full border border-white/10 tracking-tighter">표준 규격 오차율</span>
+                <p className="text-[11px] sm:text-xs text-white/40 max-w-sm leading-relaxed break-keep">적정 도포 온도 및 정량 원료 사용 등 시방서 기준을 있는 그대로 수호하겠습니다.</p>
               </div>
             </div>
           </div>
@@ -331,48 +320,71 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 사업분야 상세 모달 */}
+      {/* ⚡ 사업분야 상세 모달 (데이터 구조 변화에 따른 UI 전면 개편) */}
       {selectedId && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-md" onClick={() => setSelectedId(null)}></div>
-          <div className="relative bg-[#0F172A] border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col">
+          <div className="relative bg-[#0F172A] border border-white/10 rounded-3xl w-full max-w-3xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col">
             <button onClick={() => setSelectedId(null)} className="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center bg-black/50 hover:bg-[#22C55E] backdrop-blur-md rounded-full border border-white/20 text-white transition-all duration-300">✕</button>
-            <div className="h-44 md:h-60 flex-shrink-0 overflow-hidden bg-slate-900">
-              <img src={SERVICE_DETAILS[selectedId].img} className="w-full h-full object-cover min-h-full" alt="detail" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            <div className="h-40 md:h-64 flex-shrink-0 overflow-hidden bg-slate-900">
+              <img src={SERVICE_DETAILS[selectedId].img} className="w-full h-full object-cover" alt="detail" />
             </div>
-            <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">{SERVICE_DETAILS[selectedId].title}</h2>
-              <p className="text-white/60 mb-5 leading-relaxed break-keep text-sm">{SERVICE_DETAILS[selectedId].description}</p>
-              {SERVICE_DETAILS[selectedId].subTypes ? (
-                <div className="space-y-4 pt-1">
+            <div className="p-6 md:p-10 overflow-y-auto custom-scrollbar">
+              <div className="mb-8">
+                <span className="text-[#22C55E] text-[10px] font-black tracking-[0.5em] uppercase mb-2 block italic opacity-60">Technical Sheet</span>
+                <h2 className="text-3xl md:text-4xl font-black text-white mb-4">{SERVICE_DETAILS[selectedId].title}</h2>
+                <p className="text-white/60 leading-relaxed break-keep text-sm md:text-base">{SERVICE_DETAILS[selectedId].description}</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* 장점 섹션 */}
+                <div className="bg-white/5 border border-white/5 rounded-2xl p-5 space-y-4">
                   <h4 className="text-[#22C55E] font-black text-xs uppercase tracking-widest flex items-center gap-2">
-                    <span className="w-2 h-2 bg-[#22C55E] rounded-full animate-pulse"></span> 페인트 도색 분류 및 특징
+                    <span className="w-2 h-2 bg-[#22C55E] rounded-full"></span> 장점 (Advantages)
                   </h4>
-                  <div className="grid grid-cols-1 gap-3">
-                    {SERVICE_DETAILS[selectedId].subTypes?.map((sub, i) => (
-                      <div key={i} className="bg-white/5 border border-white/5 rounded-xl p-3.5 hover:border-[#22C55E]/30 transition-all">
-                        <h5 className="text-white font-bold text-sm mb-1 flex items-center gap-2"><span className="text-[#22C55E] text-xs">◆</span> {sub.name}</h5>
-                        <p className="text-white/50 text-xs leading-relaxed break-keep">{sub.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <h4 className="text-[#22C55E] font-bold text-xs uppercase tracking-widest">핵심 준수 원칙</h4>
-                  <ul className="grid grid-cols-1 gap-2">
-                    {SERVICE_DETAILS[selectedId].features.map((f, i) => (
-                      <li key={i} className="text-white/80 text-sm flex items-center gap-2"><span className="w-1.5 h-1.5 bg-[#22C55E] rounded-full"></span> {f}</li>
+                  <ul className="space-y-2.5">
+                    {SERVICE_DETAILS[selectedId].pros.map((p, i) => (
+                      <li key={i} className="text-white/80 text-[13px] leading-snug flex items-start gap-2 italic">
+                        <span className="text-[#22C55E]">✓</span> {p}
+                      </li>
                     ))}
                   </ul>
                 </div>
-              )}
+
+                {/* 단점 섹션 */}
+                <div className="bg-white/5 border border-white/5 rounded-2xl p-5 space-y-4">
+                  <h4 className="text-[#EF4444] font-black text-xs uppercase tracking-widest flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#EF4444] rounded-full"></span> 단점 (Drawbacks)
+                  </h4>
+                  <ul className="space-y-2.5">
+                    {SERVICE_DETAILS[selectedId].cons.map((c, i) => (
+                      <li key={i} className="text-white/60 text-[13px] leading-snug flex items-start gap-2">
+                        <span className="text-[#EF4444] opacity-50">•</span> {c}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* 주의사항 섹션 */}
+                <div className="bg-white/5 border border-white/5 rounded-2xl p-5 space-y-4">
+                  <h4 className="text-[#FACC15] font-black text-xs uppercase tracking-widest flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#FACC15] rounded-full animate-pulse"></span> 주의사항 (Notice)
+                  </h4>
+                  <ul className="space-y-2.5">
+                    {SERVICE_DETAILS[selectedId].cautions.map((ca, i) => (
+                      <li key={i} className="text-white/80 text-[13px] leading-snug flex items-start gap-2">
+                        <span className="text-[#FACC15]">!</span> {ca}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* 스마트 셀프견적 모달 창 구역 */}
+      {/* 스마트 셀프견적 모달 */}
       {isEstimatorOpen && (
         <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-md" onClick={() => setIsEstimatorOpen(false)}></div>
