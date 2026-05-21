@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-// 💡 분리해둔 스마트 셀프견적 컴포넌트를 상단에서 불러옵니다.
+// 스마트 셀프견적 컴포넌트를 불러옵니다.
 import SmartEstimator from '@/components/SmartEstimator';
 
 // --- [4대 핵심 분야] 데이터 정의 ---
@@ -15,7 +15,7 @@ const SERVICE_DETAILS = {
   },
   "02": {
     title: "페인트 도색",
-    description: "현장 상황과 목적에 맞는 최적의 도료를 선택하여 도로의 가이드라인을 선명하게 구축합니다. 공기를 맞추기 위해 공정을 건너뛰지 않으며, 규정된 두께와 선명도를 바르게 준수하여 도로 위 안전을 책임집니다.",
+    description: "현장 상황 및 목적에 맞는 최적의 도료를 선택하여 도로의 가이드라인을 선명하게 구축합니다. 공기를 맞추기 위해 공정을 건너뛰지 않으며, 규정된 두께와 선명도를 바르게 준수하여 도로 위 안전을 책임집니다.",
     features: ["상황별 맞춤형 전문 도료 적용", "규정된 도료 두께 및 선명도 사수", "단지 내 주의 구간 표준 시공"],
     subTypes: [
       {
@@ -157,16 +157,39 @@ const ServiceCard = ({ num, title, tag, imgSrc, onDetail }: { num: string; title
 export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   
-  // 💡 새롭게 만든 정밀 SmartEstimator 모달 창을 띄우는 상태 제어 변수
+  // TypeScript 빌드 에러 방지를 위해 객체 Key 타입을 엄격하게 정의합니다.
+  const [selectedId, setSelectedId] = useState<keyof typeof SERVICE_DETAILS | null>(null);
   const [isEstimatorOpen, setIsEstimatorOpen] = useState(false);
+
+  // 공지사항 상태 관리
+  const [isNoticeOpen, setIsNoticeOpen] = useState(false);
+  const [dontShowToday, setDontShowToday] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
+    
+    // 오늘 하루 열지 않기 체크
+    const expiryTime = localStorage.getItem('hideNoticePopup');
+    const currentTime = new Date().getTime();
+
+    if (!expiryTime || currentTime > parseInt(expiryTime)) {
+      localStorage.removeItem('hideNoticePopup');
+      setIsNoticeOpen(true);
+    }
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // 팝업 닫기 기능 및 로컬 스토리지 기한 저장
+  const closeNoticePopup = () => {
+    if (dontShowToday) {
+      const expiryTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24시간 계산
+      localStorage.setItem('hideNoticePopup', expiryTime.toString());
+    }
+    setIsNoticeOpen(false);
+  };
 
   return (
     <main className="min-h-screen bg-[#0F172A] text-white font-sans selection:bg-[#22C55E]/30 overflow-x-hidden">
@@ -195,25 +218,28 @@ export default function Home() {
 
         <div className={`fixed inset-0 w-full h-screen bg-[#0F172A] z-[150] flex flex-col items-center justify-start pt-36 gap-8 transition-all duration-500 lg:hidden ${isMobileMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}>
           {['About', 'Services', 'Estimator', 'Portfolio', 'Contact'].map((item) => (
-            <a 
+            <button 
               key={item} 
-              href={item === 'Estimator' ? undefined : `#${item.toLowerCase()}`}
               onClick={() => {
                 setIsMobileMenuOpen(false);
-                if (item === 'Estimator') setIsEstimatorOpen(true);
+                if (item === 'Estimator') {
+                  setIsEstimatorOpen(true);
+                } else {
+                  const element = document.getElementById(item.toLowerCase());
+                  if (element) element.scrollIntoView({ behavior: 'smooth' });
+                }
               }} 
-              className="text-[24px] font-black tracking-[0.25em] text-white hover:text-[#22C55E] cursor-pointer"
+              className="text-[24px] font-black tracking-[0.25em] text-white hover:text-[#22C55E] cursor-pointer bg-transparent border-none"
             >
               {item === 'About' ? '회사소개' : item === 'Services' ? '사업분야' : item === 'Estimator' ? '스마트셀프견적' : item === 'Portfolio' ? '시공사례' : '견적문의'}
-            </a>
+            </button>
           ))}
         </div>
 
         <div className="hidden lg:flex gap-10 text-[14px] font-bold tracking-wider text-white/70">
           <a href="#about" className="hover:text-[#22C55E] transition-colors">회사소개</a>
           <a href="#services" className="hover:text-[#22C55E] transition-colors">사업분야</a>
-          {/* 상단 탭 메뉴에도 스마트셀프견적 즉시 실행 연동 */}
-          <button onClick={() => setIsEstimatorOpen(true)} className="hover:text-[#22C55E] transition-colors font-bold">스마트셀프견적</button>
+          <button onClick={() => setIsEstimatorOpen(true)} className="hover:text-[#22C55E] transition-colors font-bold bg-transparent border-none p-0 cursor-pointer text-white/70">스마트셀프견적</button>
           <a href="#portfolio" className="hover:text-[#22C55E] transition-colors">시공사례</a>
           <a href="#contact" className="hover:text-[#22C55E] transition-colors">견적문의</a>
         </div>
@@ -240,34 +266,33 @@ export default function Home() {
               도로 위 소중한 생명을 지킵니다.
             </p>
             
-            {/* 영업 버튼 그룹 - 세 번째 버튼 클릭 시 새로 분리한 전문 견적기 오픈 */}
             <div className="flex flex-col sm:flex-row gap-2.5 w-full mt-4 md:mt-0">
-              <a href="https://open.kakao.com/o/sv4661ui" target="_blank" rel="noopener noreferrer" className="flex-1 px-2 py-3.5 bg-[#FAE100] text-[#3C1E1E] font-[900] text-[12px] sm:text-[13px] hover:bg-white transition-all rounded-xl text-center shadow-md tracking-tight block">
+              <a href="https://open.kakao.com/o/sv4661ui" target="_blank" rel="noopener noreferrer" className="flex-1 px-2 py-3.5 bg-[#FAE100] text-[#3C1E1E] font-[900] text-[15px] sm:text-[15px] hover:bg-white transition-all rounded-xl text-center shadow-md tracking-tight block">
                 카톡 견적 상담
               </a>
-              <a href="tel:010-8339-6557" className="flex-1 px-2 py-3.5 border border-white/10 bg-white/5 text-white font-[900] text-[12px] sm:text-[13px] hover:bg-white hover:text-black transition-all rounded-xl text-center tracking-tight block">
+              <a href="tel:010-8339-6557" className="flex-1 px-2 py-3.5 border border-white/10 bg-white/5 text-white font-[900] text-[15px] sm:text-[15px] hover:bg-white hover:text-black transition-all rounded-xl text-center tracking-tight block">
                 전화 상담하기
               </a>
-              <button onClick={() => setIsEstimatorOpen(true)} className="flex-1 px-2 py-3.5 bg-[#22C55E] text-white font-[900] text-[12px] sm:text-[13px] hover:bg-[#16a34a] transition-all rounded-xl text-center shadow-[0_0_15px_rgba(34,197,94,0.4)] tracking-tight block animate-pulse hover:animate-none">
-                ⚡ 스마트 셀프견적
+              <button onClick={() => setIsEstimatorOpen(true)} className="flex-1 px-2 py-3.5 bg-[#22C55E] text-white font-[900] text-[15px] sm:text-[15px] hover:bg-[#16a34a] transition-all rounded-xl text-center shadow-[0_0_15px_rgba(34,197,94,0.4)] tracking-tight block animate-pulse hover:animate-none cursor-pointer border-none">
+                ⚡ 스마트 셀프견적 ⚡
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* IDENTITY (사업소개) */}
+      {/* IDENTITY */}
       <section id="about" className="pt-14 pb-16 md:pt-20 md:pb-24 px-6 md:px-32 max-w-7xl mx-auto border-t border-white/5">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start mb-12">
           <div className="lg:col-span-6">
             <h2 className="text-[#22C55E] text-[9px] font-black tracking-[0.8em] uppercase mb-4 italic opacity-60">Company Identity</h2>
             <h3 className="text-3xl md:text-4xl font-black tracking-tighter text-white leading-[1.2]">
-              작업이 늦어지더라도, <br />
+             
               <span className="text-[#22C55E]">안전 수칙</span>과 <span className="text-white/30 italic">규격 시공은 타협하지 않습니다.</span>
             </h3>
           </div>
           <div className="lg:col-span-6 text-white/50 text-sm md:text-base font-medium leading-relaxed break-keep pt-1">
-            이응도로안전의 최우선 가치는 속도가 아닌 '원칙'입니다. 현장 마감 독촉에 쫓겨 공정을 생략하거나 하자와 타협하지 않습니다. 정해진 안전 수칙을 완벽히 지키고, 표준 시방서 규격을 미련할 만큼 바르게 준수하는 것만이 장기적으로 신뢰받는 기업을 만드는 유일한 길임을 약속드립니다.
+            이응도로안전의 최우선 가치는 속도가 아닌 '원칙'입니다. 이윤을 위해 공정을 생략하거나 하자와 타협하지 않습니다. 정해진 안전 수칙을 완벽히 지키고, 표준 시방서 규격을 미련할 만큼 바르게 준수하는 것만이 장기적으로 신뢰받는 기업을 만드는 유일한 길임을 약속드립니다.
           </div>
         </div>
 
@@ -278,12 +303,12 @@ export default function Home() {
             <div className="grid grid-cols-2 gap-4 md:gap-8 divide-x divide-white/5">
               <div className="flex flex-col items-center text-center px-2 sm:px-6">
                 <span className="text-2xl sm:text-4xl md:text-5xl font-[1000] text-white mb-1 md:mb-3 tracking-tight italic">0건</span>
-                <span className="text-[9px] sm:text-xs font-bold text-slate-200 mb-2 md:mb-3 bg-white/5 px-2 sm:px-4 py-1 rounded-full border border-white/10 tracking-tighter sm:tracking-wider">현장 안전수칙 위반</span>
-                <p className="text-[9px] sm:text-xs text-white/40 max-w-sm leading-relaxed break-keep">철저한 신호수 배치 and 안전 장비 착용 등 기본 수칙을 절대 생략하지 않겠습니다.</p>
+                <span className="text-[9px] sm:text-xs font-bold text-slate-200 mb-2 md:mb-3 bg-white/5 px-2 sm:px-4 py-1 rounded-full border border-white/10 tracking-tighter">현장 안전수칙 위반</span>
+                <p className="text-[9px] sm:text-xs text-white/40 max-w-sm leading-relaxed break-keep">철저한 신호수 배치와 안전 장비 착용 등 기본 수칙을 절대 생략하지 않겠습니다.</p>
               </div>
               <div className="flex flex-col items-center text-center px-2 sm:px-6">
                 <span className="text-2xl sm:text-4xl md:text-5xl font-[1000] text-white mb-1 md:mb-3 tracking-tight italic">0%</span>
-                <span className="text-[9px] sm:text-xs font-bold text-slate-200 mb-2 md:mb-3 bg-white/5 px-2 sm:px-4 py-1 rounded-full border border-white/10 tracking-tighter sm:tracking-wider">표준 규격 오차율</span>
+                <span className="text-[9px] sm:text-xs font-bold text-slate-200 mb-2 md:mb-3 bg-white/5 px-2 sm:px-4 py-1 rounded-full border border-white/10 tracking-tighter">표준 규격 오차율</span>
                 <p className="text-[9px] sm:text-xs text-white/40 max-w-sm leading-relaxed break-keep">적정 도포 온도 및 정량 원료 사용 등 시방서 기준을 있는 그대로 수호하겠습니다.</p>
               </div>
             </div>
@@ -300,7 +325,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {Object.entries(SERVICE_DETAILS).map(([id, service]) => (
-              <ServiceCard key={id} num={id} title={service.title} tag="Professional" imgSrc={service.img} onDetail={() => setSelectedId(id)} />
+              <ServiceCard key={id} num={id} title={service.title} tag="Professional" imgSrc={service.img} onDetail={() => setSelectedId(id as keyof typeof SERVICE_DETAILS)} />
             ))}
           </div>
         </div>
@@ -310,7 +335,7 @@ export default function Home() {
       {selectedId && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-md" onClick={() => setSelectedId(null)}></div>
-          <div className="relative bg-[#0F172A] border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 max-h-[90vh] flex flex-col">
+          <div className="relative bg-[#0F172A] border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col">
             <button onClick={() => setSelectedId(null)} className="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center bg-black/50 hover:bg-[#22C55E] backdrop-blur-md rounded-full border border-white/20 text-white transition-all duration-300">✕</button>
             <div className="h-44 md:h-60 flex-shrink-0 overflow-hidden bg-slate-900">
               <img src={SERVICE_DETAILS[selectedId].img} className="w-full h-full object-cover min-h-full" alt="detail" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -324,7 +349,7 @@ export default function Home() {
                     <span className="w-2 h-2 bg-[#22C55E] rounded-full animate-pulse"></span> 페인트 도색 분류 및 특징
                   </h4>
                   <div className="grid grid-cols-1 gap-3">
-                    {SERVICE_DETAILS[selectedId].subTypes.map((sub, i) => (
+                    {SERVICE_DETAILS[selectedId].subTypes?.map((sub, i) => (
                       <div key={i} className="bg-white/5 border border-white/5 rounded-xl p-3.5 hover:border-[#22C55E]/30 transition-all">
                         <h5 className="text-white font-bold text-sm mb-1 flex items-center gap-2"><span className="text-[#22C55E] text-xs">◆</span> {sub.name}</h5>
                         <p className="text-white/50 text-xs leading-relaxed break-keep">{sub.desc}</p>
@@ -347,19 +372,54 @@ export default function Home() {
         </div>
       )}
 
-      {/* ⚡ 분리해둔 다기능 스마트 셀프견적 모달 창 구역 */}
+      {/* 스마트 셀프견적 모달 창 구역 */}
       {isEstimatorOpen && (
         <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
-          {/* 뒷배경 누르면 모달 닫힘 */}
           <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-md" onClick={() => setIsEstimatorOpen(false)}></div>
-          
-          <div className="relative bg-[#0F172A] border border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 max-h-[92vh] flex flex-col text-white">
-            {/* 모달 상단 우측 X 닫기 버튼 */}
-            <button onClick={() => setIsEstimatorOpen(false)} className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-red-500 backdrop-blur-md rounded-full border border-white/10 text-white transition-all text-xs">✕</button>
-            
-            {/* 💡 components/SmartEstimator.tsx 내용이 이 스크롤 영역에 매끄럽게 마운트됩니다. */}
+          <div className="relative bg-[#0F172A] border border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col text-white">
+            <button onClick={() => setIsEstimatorOpen(false)} className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-red-500 backdrop-blur-md rounded-full border border-white/10 text-white transition-all text-xs border-none cursor-pointer">✕</button>
             <div className="p-2 md:p-4 overflow-y-auto custom-scrollbar">
               <SmartEstimator />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 중요 공지사항 팝업 레이어 */}
+      {isNoticeOpen && (
+        <div className="fixed inset-0 z-[500] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setIsNoticeOpen(false)}></div>
+          <div className="relative bg-[#1E293B] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col text-white animate-in fade-in zoom-in duration-200">
+            <div className="bg-[#22C55E] px-5 py-3 flex items-center gap-2">
+              <span className="text-sm">📢</span>
+              <span className="text-xs font-black tracking-wider uppercase text-slate-900">Notice</span>
+            </div>
+            <div className="p-6 md:p-8 space-y-4">
+              <h3 className="text-xl font-extrabold text-white tracking-tight break-keep">
+                이응도로안전 안내 말씀
+              </h3>
+              <div className="text-slate-300 text-sm leading-relaxed space-y-2 break-keep">
+                <p>안녕하세요. 이응도로안전입니다.</p>
+                <p>현재 스마트 셀프견적 시스템 연동이 정상 완료되어 실시간 가견적 조회가 원활하게 가능합니다.</p>
+                <p>도로 차선 도색, 미끄럼방지 포장 등 표준 시방서 규격을 엄격히 지키는 고품질 책임 시공을 약속드립니다. 궁금한 사항은 언제든 문의해 주시기 바랍니다.</p>
+              </div>
+            </div>
+            <div className="bg-slate-900/50 px-5 py-3.5 border-t border-white/5 flex items-center justify-between text-xs text-slate-400">
+              <label className="flex items-center gap-2 cursor-pointer select-none group">
+                <input 
+                  type="checkbox" 
+                  checked={dontShowToday}
+                  onChange={(e) => setDontShowToday(e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-[#22C55E] focus:ring-[#22C55E] focus:ring-offset-slate-900 transition-colors cursor-pointer"
+                />
+                <span className="group-hover:text-white transition-colors">오늘 하루 이 창 열지 않기</span>
+              </label>
+              <button 
+                onClick={closeNoticePopup} 
+                className="px-4 py-1.5 bg-white/10 hover:bg-[#22C55E] hover:text-white rounded-lg text-white font-bold transition-all text-xs border-none cursor-pointer"
+              >
+                닫기
+              </button>
             </div>
           </div>
         </div>
