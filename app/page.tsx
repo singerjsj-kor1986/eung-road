@@ -276,7 +276,7 @@ export default function Home() {
           <div className="lg:col-span-6">
             <h2 className="text-[#22C55E] text-[9px] font-black tracking-[0.8em] uppercase mb-4 italic opacity-60">Company Identity</h2>
             <h3 className="text-3xl md:text-4xl font-black tracking-tighter text-white leading-[1.2]">
-              작업이 늦어지더라도, <br />
+              이응도로안전은, <br />
               <span className="text-[#22C55E]">안전 수칙</span>과 <span className="text-white/30 italic">규격 시공은 타협하지 않습니다.</span>
             </h3>
           </div>
